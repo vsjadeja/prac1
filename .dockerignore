@@ -1,0 +1,6 @@
+storage/framework/cache/data/*
+*.md
+docker-compose.yml
+*.log
+*.gitignore
+.vscode
