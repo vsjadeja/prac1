@@ -11,6 +11,9 @@ services:
       - cacheStorage:/data
     networks:
       - backend
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    
+  # Redis explorer for application
   redisinsight:
     image: redislabs/redisinsight
     ports:
@@ -22,8 +25,6 @@ services:
       - backend
     depends_on:
       - cache
-    links:
-      - cache:redis-server
     
   # MariaDB master database for application storage
   masterdb:
@@ -83,10 +84,6 @@ services:
       - cache
       - masterdb
       - slavedb
-    links:
-      - masterdb:masterdb
-      - slavedb:slavedb
-      - cache:redis-server
 
   # PhpMyAdmin for MariaDB servers management
   phpmyadmin:
@@ -101,9 +98,6 @@ services:
     depends_on:
       - masterdb
       - slavedb
-    links:
-      - masterdb:masterdb
-      - slavedb:slavedb
     networks:
       - frontend
       - backend
