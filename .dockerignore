@@ -1,6 +1,7 @@
 storage/framework/cache/data/*
 *.md
 docker-compose.yml
-*.log
-*.gitignore
+docker-compose.production.yml
+**/*.log
+**/*.gitignore
 .vscode

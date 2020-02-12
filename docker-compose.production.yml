@@ -13,19 +13,6 @@ services:
     networks:
       - backend
     command: redis-server --requirepass ${REDIS_PASSWORD}
-
-  # Redis explorer for application
-  redisinsight:
-    image: redislabs/redisinsight
-    ports:
-      - 32541:8001
-    volumes:
-      - cacheStorage:/db
-    networks:
-      - frontend
-      - backend
-    depends_on:
-      - cache
     
   # MariaDB master database for application storage
   masterdb:
@@ -35,15 +22,15 @@ services:
     volumes:
       - dbMasterStorage:/bitnami/mariadb
     expose:
-      - 3306
+      - ${DB_PORT}
     environment:
       - MARIADB_REPLICATION_MODE=master
-      - MARIADB_REPLICATION_USER=repl_user
-      - MARIADB_REPLICATION_PASSWORD=repl_password
-      - MARIADB_ROOT_PASSWORD=T0PSc0r3r
-      - MARIADB_USER=topscorer
-      - MARIADB_PASSWORD=T0PSc0r3r@!
-      - MARIADB_DATABASE=topscorer
+      - MARIADB_REPLICATION_USER=${REPLICATION_USER}
+      - MARIADB_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
     networks:
       - backend
   # MariaDB slave database for application storage
@@ -54,17 +41,17 @@ services:
     volumes:
       - dbSlaveStorage:/bitnami/mariadb
     expose:
-      - 3306
+      - ${DB_PORT}
     environment:
       - MARIADB_REPLICATION_MODE=slave
-      - MARIADB_REPLICATION_USER=repl_user
-      - MARIADB_REPLICATION_PASSWORD=repl_password
+      - MARIADB_REPLICATION_USER=${REPLICATION_USER}
+      - MARIADB_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
       - MARIADB_MASTER_HOST=masterdb
-      - MARIADB_MASTER_PORT_NUMBER=3306
-      - MARIADB_MASTER_ROOT_PASSWORD=T0PSc0r3r
-      - MARIADB_USER=topscorer
-      - MARIADB_PASSWORD=T0PSc0r3r@!
-      - MARIADB_DATABASE=topscorer
+      - MARIADB_MASTER_PORT_NUMBER=${DB_PORT}
+      - MARIADB_MASTER_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
     networks:
       - backend
     depends_on:
@@ -73,14 +60,10 @@ services:
   web:
     container_name: ${APP_NAME}
     restart: always
-    tty: true
     build:
       context: ./
     ports:
       - 80:8080
-    volumes:
-      - apilogStorage:/var/log
-      - ./:/var/www/html
     networks:
       - frontend
       - backend
@@ -89,25 +72,7 @@ services:
       - masterdb
       - slavedb
 
-  # PhpMyAdmin for MariaDB servers management
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - 32540:80
-    environment:
-      - PMA_HOSTS=masterdb,slavedb
-      # Remove below user and password env var for production.
-      - PMA_USER=root
-      - PMA_PASSWORD=T0PSc0r3r
-    depends_on:
-      - masterdb
-      - slavedb
-    networks:
-      - frontend
-      - backend
-
 volumes:
-  apilogStorage: {}
   cacheStorage: {}
   dbMasterStorage: {}
   dbSlaveStorage: {}
