@@ -38,12 +38,12 @@ services:
       - 3306
     environment:
       - MARIADB_REPLICATION_MODE=master
-      - MARIADB_REPLICATION_USER=repl_user
-      - MARIADB_REPLICATION_PASSWORD=repl_password
-      - MARIADB_ROOT_PASSWORD=T0PSc0r3r
-      - MARIADB_USER=topscorer
-      - MARIADB_PASSWORD=T0PSc0r3r@!
-      - MARIADB_DATABASE=topscorer
+      - MARIADB_REPLICATION_USER=${REPLICATION_USER}
+      - MARIADB_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
     networks:
       - backend
   # MariaDB slave database for application storage
@@ -57,14 +57,14 @@ services:
       - 3306
     environment:
       - MARIADB_REPLICATION_MODE=slave
-      - MARIADB_REPLICATION_USER=repl_user
-      - MARIADB_REPLICATION_PASSWORD=repl_password
+      - MARIADB_REPLICATION_USER=${REPLICATION_USER}
+      - MARIADB_REPLICATION_PASSWORD=${REPLICATION_PASSWORD}
       - MARIADB_MASTER_HOST=masterdb
-      - MARIADB_MASTER_PORT_NUMBER=3306
-      - MARIADB_MASTER_ROOT_PASSWORD=T0PSc0r3r
-      - MARIADB_USER=topscorer
-      - MARIADB_PASSWORD=T0PSc0r3r@!
-      - MARIADB_DATABASE=topscorer
+      - MARIADB_MASTER_PORT_NUMBER=${DB_PORT}
+      - MARIADB_MASTER_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
     networks:
       - backend
     depends_on:
@@ -79,7 +79,7 @@ services:
     ports:
       - 80:8080
     volumes:
-      - apilogStorage:/var/log
+      # only for development purpose.
       - ./:/var/www/html
     networks:
       - frontend
@@ -98,7 +98,7 @@ services:
       - PMA_HOSTS=masterdb,slavedb
       # Remove below user and password env var for production.
       - PMA_USER=root
-      - PMA_PASSWORD=T0PSc0r3r
+      - PMA_PASSWORD=${ROOT_PASSWORD}
     depends_on:
       - masterdb
       - slavedb
@@ -107,7 +107,6 @@ services:
       - backend
 
 volumes:
-  apilogStorage: {}
   cacheStorage: {}
   dbMasterStorage: {}
   dbSlaveStorage: {}
