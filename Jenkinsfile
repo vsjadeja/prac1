@@ -7,13 +7,13 @@ node {
 
     stage('Build image'){
         /* build a docker image*/
-        app = docker.build("vjadeja/test:${env.BUILD_NUMBER}")
+        app = docker.build("vjadeja/prac1:${env.BUILD_NUMBER}")
     }
 
     stage('Test image'){
         /* run unit test inside new image*/
-        docker.image("vjadeja/test:${env.BUILD_NUMBER}").inside() {
-            sh 'php ./vendor/bin/phpunit'
+        docker.image("vjadeja/prac1:${env.BUILD_NUMBER}").inside {
+            sh 'vendor/bin/phpunit'
         }
     }
 
