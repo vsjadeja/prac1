@@ -21,6 +21,7 @@ node {
         /* push a new docker image to docker hub registry using credentials*/
         docker.withRegistry('https://registry.hub.docker.com','docker-login'){
             app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
         }
         echo "Trying to push docker build to docker hub"
     }
