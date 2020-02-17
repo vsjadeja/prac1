@@ -2,16 +2,16 @@ node {
     def app
 
     stage('Clone repository'){
-        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/vsjadeja/prac1']]])
+        checkout scm
     }
 
     stage('Build image'){
-        app = docker.build("vjadeja/test")
+        app = docker.build("vjadeja/test:${env.BUILD_NUMBER}")
     }
 
     stage('Test image'){
         app.inside {
-            echo "Test passed";
+            sh 'vendor/bin/phpunit'
         }
     }
 
